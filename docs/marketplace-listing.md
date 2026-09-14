@@ -59,10 +59,11 @@ is pulled in automatically.
 
 ### What makes it different
 
-- **Agent-ready, not agent-locked.** An MCP server exposes 52 role-scoped
-  tools. Click Connect Claude — *"book Mr. Rao a deluxe for the
-  weekend with breakfast"* — it quotes, books, and logs every action. Bring
-  your own AI; there is no bundled model markup.
+- **Agent-ready, not agent-locked.** An MCP server exposes 85 role-scoped
+  tools, filtered by the property's enabled modules. Click Connect Claude —
+  *"book Mr. Rao a deluxe for the weekend with breakfast"* — it quotes,
+  books, and logs every action. Bring your own AI; there is no bundled
+  model markup.
 - **Deterministic money.** Prices, taxes and availability come from a
   pricing engine, never from a language model. Tax slabs, multi-rate
   invoices and the no-overbooking guard are code, verified by an eval suite
@@ -98,14 +99,15 @@ is pulled in automatically.
   enforced in code.
 - **Billing** — folios with per-line tax, corporate charge routing, group
   master folios, exact %/amount charge splits, automated night audit, tax
-  invoices with B2B fields, cashier reconciliation, payment links via
-  frappe/payments.
+  invoices with B2B fields, Opera-style cashier till (FO+POS cash, PIN
+  pad), append-only folio ledger, payment links via frappe/payments.
 - **Restaurant POS** — area-wise table map with live states, concurrent &
-  split bills, dine-in / room service / takeaway / delivery, 80mm thermal
-  KOT & bill printing, kitchen display, inventory & recipes, guest QR
-  ordering, room posting (alcohol-aware).
+  split bills, dine-in / room service / takeaway / delivery, full-screen
+  till and kitchen pass, 80mm thermal KOT & bill printing, kitchen display,
+  inventory & recipes, guest QR ordering, room posting (alcohol-aware).
 - **Operations** — service tickets with SLA, a housekeeping mobile app,
-  end-to-end guest laundry, lost & found, shift handover, venues & events.
+  end-to-end guest laundry, lost & found, shift handover, venues & events
+  (send quote, guest response, department checklists on Confirm).
 - **Guests** — self check-in with ID & address-proof capture, printable
   GRC with the legal occupant register, editable actual times, a stay
   ledger with advances/deposits/guarded refunds, retention-aware ID
@@ -118,9 +120,10 @@ is pulled in automatically.
   flat-tax generic for everywhere else; currency and number locale follow
   the pack.
 - **Platform** — multi-property with per-user scoping, six-role RBAC, dark
-  mode, onboarding wizard, CSV migration importers (eZee / Cloudbeds
-  presets), and a 51-check eval harness + 13-journey front-desk persona
-  suite in CI.
+  mode, property time zone, System Health diagnostics, AI provider presets
+  (OpenAI, Gemini, Groq, OpenRouter, Ollama), onboarding wizard, CSV
+  migration importers (eZee / Cloudbeds presets), and a 51-check eval
+  harness + 13-journey front-desk persona suite in CI.
 
 ### After install
 
@@ -216,8 +219,8 @@ In https://frappecloud.com/dashboard → **Marketplace** → **Kamra**:
 3. **Logo** — `branding/png/kamra-mark-512.png`.
 4. **Screenshots** — the 13 files above, in that order, with captions.
 5. **Links** — Support + Privacy are mandatory; fill the rest too.
-6. **Releases** — create / select the `main` release at **v2.5.0**
-   (`7a50c56` / tag `v2.5.0`) and click **Publish**.
+6. **Releases** — create / select the `main` release at **v2.6.2**
+   (tag `v2.6.2` after the Release Please PR merges) and click **Publish**.
 7. If a previous request is **Rejected**, cancel it and publish a new
    one from current `main`.
 8. If the app has been in Draft **more than 10 days**, raise a ticket at
@@ -235,12 +238,12 @@ and still shows "Not Available" (Draft / no approved public release).
 
 We submitted earlier; Semgrep findings from that review were fixed in
 https://github.com/Kamra-PMS/kamra-pms/pull/16 and are on main. Stable
-release is v2.5.0 (Frappe v16, AGPL-3.0, required_apps = payments).
+release is v2.6.2 (Frappe v16, AGPL-3.0, required_apps = payments).
 
 Please re-scan main and approve the latest release.
 
 Repo: https://github.com/Kamra-PMS/kamra-pms
-Branch / tag: main / v2.5.0
+Branch / tag: main / v2.6.2
 Demo: https://demo.kamrapms.com
 Docs: https://kamrapms.com/docs/
 Support: https://kamrapms.com/support
@@ -265,7 +268,7 @@ POS, housekeeping, folios and tax billing — install from the Frappe Cloud
 Marketplace onto your site.
 
 - Marketplace: https://frappecloud.com/marketplace/apps/kamra
-- Release: https://github.com/Kamra-PMS/kamra-pms/releases/tag/v2.5.0
+- Release: https://github.com/Kamra-PMS/kamra-pms/releases/tag/v2.6.2
 - Live demo: https://demo.kamrapms.com
 - Villa catalog: https://demo.kamrapms.com/book
 - Docs: https://kamrapms.com/docs/
