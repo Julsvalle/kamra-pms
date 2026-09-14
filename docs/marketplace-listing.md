@@ -219,8 +219,8 @@ In https://frappecloud.com/dashboard → **Marketplace** → **Kamra**:
 3. **Logo** — `branding/png/kamra-mark-512.png`.
 4. **Screenshots** — the 13 files above, in that order, with captions.
 5. **Links** — Support + Privacy are mandatory; fill the rest too.
-6. **Releases** — create / select the `main` release at **v2.5.0**
-   (`7a50c56` / tag `v2.5.0`) and click **Publish**.
+6. **Releases** — create / select the `main` release at **v2.6.2**
+   (tag `v2.6.2` after the Release Please PR merges) and click **Publish**.
 7. If a previous request is **Rejected**, cancel it and publish a new
    one from current `main`.
 8. If the app has been in Draft **more than 10 days**, raise a ticket at
@@ -238,12 +238,12 @@ and still shows "Not Available" (Draft / no approved public release).
 
 We submitted earlier; Semgrep findings from that review were fixed in
 https://github.com/Kamra-PMS/kamra-pms/pull/16 and are on main. Stable
-release is v2.5.0 (Frappe v16, AGPL-3.0, required_apps = payments).
+release is v2.6.2 (Frappe v16, AGPL-3.0, required_apps = payments).
 
 Please re-scan main and approve the latest release.
 
 Repo: https://github.com/Kamra-PMS/kamra-pms
-Branch / tag: main / v2.5.0
+Branch / tag: main / v2.6.2
 Demo: https://demo.kamrapms.com
 Docs: https://kamrapms.com/docs/
 Support: https://kamrapms.com/support
@@ -268,7 +268,7 @@ POS, housekeeping, folios and tax billing — install from the Frappe Cloud
 Marketplace onto your site.
 
 - Marketplace: https://frappecloud.com/marketplace/apps/kamra
-- Release: https://github.com/Kamra-PMS/kamra-pms/releases/tag/v2.5.0
+- Release: https://github.com/Kamra-PMS/kamra-pms/releases/tag/v2.6.2
 - Live demo: https://demo.kamrapms.com
 - Villa catalog: https://demo.kamrapms.com/book
 - Docs: https://kamrapms.com/docs/
