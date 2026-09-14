@@ -220,7 +220,7 @@ In https://frappecloud.com/dashboard → **Marketplace** → **Kamra**:
 4. **Screenshots** — the 13 files above, in that order, with captions.
 5. **Links** — Support + Privacy are mandatory; fill the rest too.
 6. **Releases** — create / select the `main` release at **v2.6.2**
-   (tag `v2.6.2` after the Release Please PR merges) and click **Publish**.
+   (`1533503` / tag [`v2.6.2`](https://github.com/Kamra-PMS/kamra-pms/releases/tag/v2.6.2)) and click **Publish**.
 7. If a previous request is **Rejected**, cancel it and publish a new
    one from current `main`.
 8. If the app has been in Draft **more than 10 days**, raise a ticket at
