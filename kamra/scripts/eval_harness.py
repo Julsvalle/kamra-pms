@@ -137,6 +137,45 @@ def t3():
 	assert rates == [8000, 8000, 4000], rates
 
 
+@check("a season only moves the room type it names")
+def t3b():
+	"""The villa's weekend price must never become the room's weekend
+	price. A season naming a room type leaves every other type alone;
+	one with the room type blank stays house-wide."""
+	from decimal import Decimal
+
+	from kamra.pricing import season_adjust
+
+	villa = frappe.get_doc({
+		"doctype": "Room Type", "property": P, "room_type_code": "EVV",
+		"room_type_name": "Eval Villa", "base_price": 30000,
+		"base_occupancy": 2, "adults_capacity": 4, "children_capacity": 2,
+		"tax_percent": 5,
+	}).insert(ignore_permissions=True)
+	season = frappe.get_doc({
+		"doctype": "Season", "property": P, "room_type": villa.name,
+		"season_name": "EVAL Villa Weekend",
+		"start_date": "2030-03-01", "end_date": "2030-03-31",
+		"adjustment_type": "Absolute", "adjustment_value": 36800,
+		"priority": 100,
+	}).insert(ignore_permissions=True)
+	try:
+		base = Decimal(4000)
+		priced = season_adjust(P, "2030-03-05", base, villa.name)
+		assert priced == 36800, priced
+		# the regression: the villa's season must not price the room
+		leaked = season_adjust(P, "2030-03-05", base, RT)
+		assert leaked == base, leaked
+		# nor a caller that names no room type at all
+		blanket = season_adjust(P, "2030-03-05", base)
+		assert blanket == base, blanket
+	finally:
+		frappe.delete_doc("Season", season.name, force=True,
+		                  ignore_permissions=True)
+		frappe.delete_doc("Room Type", villa.name, force=True,
+		                  ignore_permissions=True)
+
+
 @check("GST slab: 5% below threshold, 18% above")
 def t4():
 	from kamra.pricing import quote
@@ -3120,7 +3159,7 @@ def execute():
 	frappe.db.savepoint("eval_start")
 	try:
 		RT, ROOM = setup()
-		for fn in (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13,
+		for fn in (t1, t2, t3, t3b, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13,
 		           t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24,
 		           t25, t26, t27, t28, t29, t30, t31, t32, t33, t34, t35,
 		           t36, t37, t38, t39, t40, t41, t42, t43, t44, t45, t46, t47, t48, t49, t50, t51, t53,

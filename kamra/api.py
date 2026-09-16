@@ -175,6 +175,9 @@ def set_room_rate(property: str, room_type: str, start_date: str,
 		"doctype": "Season",
 		"property": property,
 		"season_name": f"Rate set {room_type.split('-')[-1]} {start_date}→{end_date}{season_name_suffix}",
+		# scope it to the room type the caller priced - a blank room_type
+		# would set this rate for every room type in the house
+		"room_type": room_type,
 		"start_date": start_date,
 		"end_date": end_date,
 		"adjustment_type": "Absolute",
@@ -2773,7 +2776,8 @@ def availability_calendar(property: str, start_date: str | None = None, days: in
 				cells.append({
 					"date": str(date),
 					"available": caps[i] if i < len(caps) else 0,
-					"rate": float(season_adjust(property, date, base)),
+					"rate": float(season_adjust(property, date, base,
+					                            rt.name)),
 				})
 		else:
 			total = frappe.db.count(
@@ -2800,7 +2804,8 @@ def availability_calendar(property: str, start_date: str | None = None, days: in
 				cells.append({
 					"date": str(date),
 					"available": max(0, total - taken),
-					"rate": float(season_adjust(property, date, base)),
+					"rate": float(season_adjust(property, date, base,
+					                            rt.name)),
 				})
 		rows.append({
 			"room_type": rt.name,
