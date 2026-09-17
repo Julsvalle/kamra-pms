@@ -85,8 +85,33 @@ def demand_adjust(property: str, room_type: str, date, rate: Decimal,
 	return rate, tier
 
 
-def season_adjust(property: str, date, base: Decimal) -> Decimal:
-	"""Apply the highest-priority active season covering `date`."""
+def _season_covers_day(season, day_abbr: str) -> bool:
+	"""A blank days_of_week runs every day; otherwise the weekday has to be
+	listed, with the weekend/weekday shorthands expanded."""
+	if not season.days_of_week:
+		return True
+	normalized_days = set()
+	for d in (x.strip().lower() for x in season.days_of_week.split(",")):
+		if d in ("weekend", "weekends"):
+			normalized_days.update(["sat", "sun"])
+		elif d in ("weekday", "weekdays"):
+			normalized_days.update(["mon", "tue", "wed", "thu", "fri"])
+		else:
+			normalized_days.add(d[:3])
+	return day_abbr in normalized_days
+
+
+def season_adjust(property: str, date, base: Decimal,
+                  room_type: str | None = None) -> Decimal:
+	"""Apply the active season covering `date` for this room type.
+
+	A season that names a room type moves only that room type's rate; one
+	with the field left blank is house-wide - "blank = all", as the Seasons
+	form says. The room-type season wins over a house-wide one and priority
+	breaks the tie inside each group, the same most-specific-wins rule the
+	rate guardrails use. Called without a room_type only house-wide seasons
+	apply, so one room type's rate can never be charged for another.
+	"""
 	seasons = frappe.get_all(
 		"Season",
 		filters={
@@ -94,39 +119,32 @@ def season_adjust(property: str, date, base: Decimal) -> Decimal:
 			"disabled": 0,
 			"start_date": ("<=", date),
 			"end_date": (">=", date),
+			"room_type": ("in", [room_type, "", None]),
 		},
-		fields=["adjustment_type", "adjustment_value", "days_of_week"],
+		fields=["adjustment_type", "adjustment_value", "days_of_week",
+		        "room_type", "priority"],
 		order_by="priority desc",
 	)
 	if not seasons:
 		return base
 
 	from frappe.utils import getdate
-	dt = getdate(date)
-	day_abbr = dt.strftime("%a").lower()
+	day_abbr = getdate(date).strftime("%a").lower()
+	todays = [s for s in seasons if _season_covers_day(s, day_abbr)]
+	if not todays:
+		return base
 
-	for s in seasons:
-		if s.days_of_week:
-			days = [d.strip().lower() for d in s.days_of_week.split(",")]
-			normalized_days = set()
-			for d in days:
-				if d in ("weekend", "weekends"):
-					normalized_days.update(["sat", "sun"])
-				elif d in ("weekday", "weekdays"):
-					normalized_days.update(["mon", "tue", "wed", "thu", "fri"])
-				else:
-					normalized_days.add(d[:3])
-			if day_abbr not in normalized_days:
-				continue
+	# most specific wins, then priority - `todays` is already priority desc,
+	# so max() keeps the highest-priority season within each group
+	s = max(todays, key=lambda x: (1 if x.room_type else 0,
+	                               float(x.priority or 0)))
 
-		v = _dec(s.adjustment_value)
-		if s.adjustment_type == "Percent":
-			return base * (Decimal(1) + v / Decimal(100))
-		if s.adjustment_type == "Amount":
-			return base + v
-		return v  # Absolute
-
-	return base
+	v = _dec(s.adjustment_value)
+	if s.adjustment_type == "Percent":
+		return base * (Decimal(1) + v / Decimal(100))
+	if s.adjustment_type == "Amount":
+		return base + v
+	return v  # Absolute
 
 
 def room_gst_rate(property: str, room_type_doc, nightly_rate: Decimal) -> Decimal:
@@ -195,7 +213,7 @@ def quote(
 	for i in range(max(nights, 1)):
 		date = add_days(check_in_date, i)
 		rate = season_adjust(
-			property, date, occupancy_rate(rt, adults, children)
+			property, date, occupancy_rate(rt, adults, children), room_type
 		)
 		# demand pricing: when the house fills past a hurdle tier, the
 		# premium applies and the tier's floor holds - decided here, in
