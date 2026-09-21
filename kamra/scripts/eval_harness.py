@@ -3148,6 +3148,90 @@ def t76():
 	assert bq.customer_profile(P, phone="+91 90000 12121")["found"]
 
 
+@check("connect: link, check in, and an encrypted offsite backup that restores byte-for-byte")
+def t78():
+	import os
+	import shutil
+
+	from kamra.connect import client, crypto
+
+	key = "kc_eval_connect_key"
+	chunks, backups = {}, {}
+
+	def fake_hub(name, k, json_body=None, params=None, data=None, raw=False):
+		"""Just enough of the hub's HTTP contract to exercise the install side."""
+		if name == "register":
+			return {"key": key, "install": "CI-EVAL", "owner_email": json_body["owner_email"],
+			        "plan": "Free", "entitlements": {"advisories": True},
+			        "wallet_balance": 0, "monitor_state": "Unknown"}
+		assert k == key, f"{name} called without the install's key"
+		if name == "heartbeat":
+			assert "guest" not in str(json_body).lower(), "check-in carried guest data"
+			return {"install": "CI-EVAL", "owner_email": "owner@evalhotel.com", "plan": "Pro",
+			        "entitlements": {"backups": True, "retention_days": 30},
+			        "advisories": [{"name": "ADV-26-001", "title": "Patch release",
+			                        "severity": "Security", "body": "Update now."}],
+			        "benchmark": None, "wallet_balance": 0, "monitor_state": "Up"}
+		if name == "backup_begin":
+			backups["CB-EVAL"] = None
+			return {"backup": "CB-EVAL", "max_chunk_bytes": 16 << 20}
+		if name == "backup_chunk":
+			assert b"guest ledger" not in data, "plaintext reached the hub"
+			chunks[(params["backup"], params["file"], params["index"])] = data
+			return {"ok": True}
+		if name == "backup_finish":
+			backups[json_body["backup"]] = json_body["manifest"]
+			return {"ok": True}
+		if name == "backup_list":
+			return [{"name": b, "finished_on": "2026-09-22 02:30:00", "total_bytes": 1,
+			         "kamra_version": "eval", "manifest": m} for b, m in backups.items()]
+		if name == "backup_fetch":
+			return chunks[(params["backup"], params["file"], params["index"])]
+		raise AssertionError(f"unexpected hub call {name}")
+
+	saved = client.TRANSPORT
+	client.TRANSPORT = fake_hub
+	src = frappe.get_site_path("private", "eval-connect-src.bin")
+	restore_dir = frappe.get_site_path("private", "backups", "connect-restore", "CB-EVAL")
+	try:
+		st = client.register("owner@evalhotel.com")
+		assert st["linked"] and st["plan"] == "Pro", st
+		assert st["has_recovery_key"], "no recovery key made on link"
+		assert st["advisories"][0]["severity"] == "Security", st["advisories"]
+
+		payload = b"guest ledger " * 1_500_000  # ~19 MB -> three 8 MB chunks
+		with open(src, "wb") as fh:
+			fh.write(payload)
+		up = client.upload_files([src])
+		assert up["files"][0]["chunks"] == 3, up
+
+		got = client.download_backup("CB-EVAL")
+		with open(got["files"][0], "rb") as fh:
+			assert fh.read() == payload, "restored bytes differ"
+		assert got["command"].startswith("bench --site"), got["command"]
+
+		# someone else's key cannot read it
+		s = frappe.get_single("Kamra Connect Settings")
+		good = s.get_password("recovery_key")
+		s.recovery_key = crypto.new_key()
+		s.save(ignore_permissions=True)
+		try:
+			client.download_backup("CB-EVAL")
+			raise AssertionError("a wrong recovery key decrypted the backup")
+		except ValueError:
+			pass
+		s.recovery_key = good
+		s.save(ignore_permissions=True)
+
+		st = client.unlink()
+		assert not st["linked"] and st["has_recovery_key"], st
+	finally:
+		client.TRANSPORT = saved
+		if os.path.exists(src):
+			os.remove(src)
+		shutil.rmtree(restore_dir, ignore_errors=True)
+
+
 def execute():
 	global RT, ROOM
 	# frappe.locale.get_locale_value crashes (UnboundLocalError) when no
@@ -3165,7 +3249,7 @@ def execute():
 		           t36, t37, t38, t39, t40, t41, t42, t43, t44, t45, t46, t47, t48, t49, t50, t51, t53,
 		           t54, t55, t56, t57, t58, t59, t60, t61, t62, t63, t64,
 		           t65, t66, t67, t68, t69, t70,
-		           t71, t72, t73, t74, t75, t76):
+		           t71, t72, t73, t74, t75, t76, t78):
 			fn()
 	finally:
 		frappe.db.commit = real_commit

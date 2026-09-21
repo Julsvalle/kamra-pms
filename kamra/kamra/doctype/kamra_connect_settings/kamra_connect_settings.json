@@ -1,0 +1,200 @@
+{
+ "actions": [],
+ "creation": "2026-09-22 10:00:00.000000",
+ "modified": "2026-09-22 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "module": "Kamra",
+ "name": "Kamra Connect Settings",
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "editable_grid": 1,
+ "field_order": [
+  "hub_url",
+  "connect_key",
+  "linked",
+  "install_name",
+  "owner_email",
+  "column_break_plan",
+  "plan",
+  "plan_expires",
+  "wallet_balance",
+  "monitor_state",
+  "sb_backup",
+  "backup_enabled",
+  "recovery_key",
+  "last_backup",
+  "last_backup_status",
+  "last_restore",
+  "sb_state",
+  "share_benchmarks",
+  "last_heartbeat",
+  "entitlements",
+  "advisories",
+  "benchmark"
+ ],
+ "fields": [
+  {
+   "fieldname": "hub_url",
+   "fieldtype": "Data",
+   "label": "Hub URL",
+   "default": "https://hub.kamrapms.com",
+   "description": "Where this install checks in. Leave as is unless you run your own hub."
+  },
+  {
+   "fieldname": "connect_key",
+   "fieldtype": "Password",
+   "label": "Connect key"
+  },
+  {
+   "fieldname": "linked",
+   "fieldtype": "Check",
+   "label": "Linked",
+   "default": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "install_name",
+   "fieldtype": "Data",
+   "label": "Install ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "owner_email",
+   "fieldtype": "Data",
+   "label": "Owner email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_plan",
+   "fieldtype": "Column Break",
+   "label": ""
+  },
+  {
+   "fieldname": "plan",
+   "fieldtype": "Data",
+   "label": "Plan",
+   "read_only": 1
+  },
+  {
+   "fieldname": "plan_expires",
+   "fieldtype": "Date",
+   "label": "Plan renews or ends",
+   "read_only": 1
+  },
+  {
+   "fieldname": "wallet_balance",
+   "fieldtype": "Currency",
+   "label": "Wallet balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "monitor_state",
+   "fieldtype": "Data",
+   "label": "Uptime monitor",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_backup",
+   "fieldtype": "Section Break",
+   "label": "Offsite backups"
+  },
+  {
+   "fieldname": "backup_enabled",
+   "fieldtype": "Check",
+   "label": "Nightly offsite backup",
+   "default": "1"
+  },
+  {
+   "fieldname": "recovery_key",
+   "fieldtype": "Password",
+   "label": "Recovery key",
+   "description": "Encrypts backups on this server before upload. Kamra never sees it. Without it a backup cannot be restored."
+  },
+  {
+   "fieldname": "last_backup",
+   "fieldtype": "Datetime",
+   "label": "Last backup",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_backup_status",
+   "fieldtype": "Small Text",
+   "label": "Last backup result",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_restore",
+   "fieldtype": "Small Text",
+   "label": "Last restore download",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_state",
+   "fieldtype": "Section Break",
+   "label": "Hub state"
+  },
+  {
+   "fieldname": "share_benchmarks",
+   "fieldtype": "Check",
+   "label": "Share anonymous occupancy and ADR for city benchmarks",
+   "default": "0"
+  },
+  {
+   "fieldname": "last_heartbeat",
+   "fieldtype": "Datetime",
+   "label": "Last check-in",
+   "read_only": 1
+  },
+  {
+   "fieldname": "entitlements",
+   "fieldtype": "Long Text",
+   "label": "Entitlements",
+   "read_only": 1
+  },
+  {
+   "fieldname": "advisories",
+   "fieldtype": "Long Text",
+   "label": "Advisories",
+   "read_only": 1
+  },
+  {
+   "fieldname": "benchmark",
+   "fieldtype": "Long Text",
+   "label": "Benchmark",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "print": 1,
+   "report": 0,
+   "share": 1,
+   "export": 0
+  },
+  {
+   "role": "Hotel Admin",
+   "read": 1,
+   "write": 1,
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "print": 1,
+   "report": 0,
+   "share": 1,
+   "export": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "links": [],
+ "track_changes": 1,
+ "issingle": 1
+}

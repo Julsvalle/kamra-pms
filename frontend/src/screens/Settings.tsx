@@ -11,6 +11,7 @@ import { getLang, setLang, LANGS, type Lang } from "../lib/dir"
 import { useT } from "../lib/i18n"
 import { Button } from "../components/ui/button"
 import ImageField from "../components/ImageField"
+import { ConnectCard } from "../components/ConnectCard"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { cur, moneyLocale } from "../lib/money"
 
@@ -845,6 +846,8 @@ export default function Settings() {
       />
 
       <AiAssistantCard property={property} doc={ai} onSaved={load} />
+
+      <ConnectCard property={property} />
 
       <SettingsCard
         title="Revenue controls"
