@@ -15,6 +15,7 @@ import { accentVars } from "../lib/accents"
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
 import { Sheet } from "../components/ui/sheet"
+import { BookingDone, type BookResult } from "../components/BookingDone"
 import { cur, moneyLocale, adoptUiLocale } from "../lib/money"
 import { formatPhoneDisplay, formatPhoneTel } from "../lib/phone"
 
@@ -231,7 +232,7 @@ export default function PublicListing() {
     meal_plan: "",
     special_requests: "",
   })
-  const [done, setDone] = useState<{ reservation: string; amount: number } | null>(null)
+  const [done, setDone] = useState<BookResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -321,7 +322,7 @@ export default function PublicListing() {
     setBusy(true)
     setError(null)
     try {
-      const res = await call<{ reservation: string; amount_after_tax: number }>(
+      const res = await call<BookResult>(
         "kamra.public_api.book",
         {
           property: resolved.property,
@@ -333,7 +334,7 @@ export default function PublicListing() {
           ...form,
         },
       )
-      setDone({ reservation: res.reservation, amount: res.amount_after_tax })
+      setDone(res)
     } catch (e) {
       setError(serverError(e))
     } finally {
@@ -756,7 +757,7 @@ export default function PublicListing() {
       {booking && (
         <Sheet
           wide
-          title={done ? "Booking confirmed" : "Complete your booking"}
+          title={done ? (done.pay_url && done.status !== "Confirmed" ? "One step left: pay to confirm" : done.status === "Requested" ? "Request sent" : "Booking confirmed") : "Complete your booking"}
           description={
             done
               ? undefined
@@ -789,13 +790,7 @@ export default function PublicListing() {
           }
         >
           {done ? (
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-800">
-              <p className="text-lg font-semibold">{done.reservation}</p>
-              <p className="mt-1 text-sm">
-                Total {cur()}
-                {inr(done.amount)}
-              </p>
-            </div>
+            <BookingDone result={done} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">

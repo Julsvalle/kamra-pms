@@ -54,6 +54,7 @@ export default defineConfig({
         items: [
           { text: "Features tour", link: "/features" },
           { text: "WhatsApp on your number", link: "/whatsapp" },
+          { text: "Online payments (Razorpay)", link: "/payments" },
           { text: "Channel manager (OTA sync)", link: "/channel-manager" },
           { text: "User guide", link: "/user-guide" },
         ],

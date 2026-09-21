@@ -3148,6 +3148,87 @@ def t76():
 	assert bq.customer_profile(P, phone="+91 90000 12121")["found"]
 
 
+@check("payments: a website booking takes its advance online and confirms on payment")
+def t77():
+	import hashlib
+	import hmac
+	import json
+
+	from kamra import payments
+	from kamra import public_api as pub
+
+	frappe.db.set_value("Property", P, {
+		"booking_payment_mode": "Advance percent", "advance_percent": 25,
+		"booking_mode": "Instant"})
+	frappe.clear_document_cache("Property", P)
+	gw = frappe.db.get_value("Payment Gateway Settings", {"property": P})
+	if gw:
+		frappe.db.set_value("Payment Gateway Settings", gw,
+		                    {"enabled": 1, "test_mode": 1})
+	else:
+		gw = frappe.get_doc({
+			"doctype": "Payment Gateway Settings", "property": P,
+			"gateway": "Razorpay", "enabled": 1, "test_mode": 1,
+		}).insert(ignore_permissions=True).name
+
+	def guest_book(day, name, phone):
+		frappe.set_user("Guest")  # nosemgrep: frappe-setuser -- the public booking page runs as Guest
+		try:
+			return pub.book(P, RT, add_days(nowdate(), day),
+			                add_days(nowdate(), day + 2), name, phone, adults=1)
+		finally:
+			frappe.set_user("Administrator")  # nosemgrep: frappe-setuser -- restore the harness user
+
+	def paid(res, link, amount):
+		return json.dumps({"event": "payment_link.paid", "payload": {"payment_link": {
+			"entity": {"id": link, "amount_paid": int(round(amount * 100)),
+			           "notes": {"reservation": res, "property": P}}}}}).encode()
+
+	out = guest_book(240, "Eval Online Payer", "+91 90000 77701")
+	res = out["reservation"]
+	assert out["status"] == "Pending Payment", out
+	due = round(float(out["amount_after_tax"]) * 0.25, 2)
+	assert out["pay_url"] and out["pay_amount"] == due, out
+
+	# the gateway reports the payment: booking confirms, money on the folio
+	body = paid(res, "plink_EVAL77A", due)
+	first = payments.handle_webhook(body)
+	assert first["posted"], first
+	assert frappe.db.get_value("Reservation", res, "status") == "Confirmed"
+	assert float(frappe.db.get_value("Reservation", res, "advance_paid")) == due
+
+	# Razorpay retries webhooks: the same event must not post twice
+	again = payments.handle_webhook(body)
+	assert not again["posted"], again
+	assert float(frappe.db.get_value("Reservation", res, "advance_paid")) == due
+
+	# paid after the hold lapsed: money flagged for a person, room not re-sold
+	late = guest_book(250, "Eval Late Payer", "+91 90000 77702")
+	frappe.db.set_value("Reservation", late["reservation"], "status", "Cancelled")
+	flagged = payments.handle_webhook(paid(late["reservation"], "plink_EVAL77B", due))
+	assert flagged.get("needs_attention") and not flagged["posted"], flagged
+	assert frappe.db.get_value("Reservation", late["reservation"], "status") == "Cancelled"
+
+	# live money: an unsigned webhook is refused outright ...
+	frappe.db.set_value("Payment Gateway Settings", gw, "test_mode", 0)
+	try:
+		payments.handle_webhook(body)
+		raise AssertionError("live webhook accepted without a secret")
+	except frappe.PermissionError:
+		pass
+	# ... and with a secret, only the right signature gets through
+	doc = frappe.get_doc("Payment Gateway Settings", gw)
+	doc.webhook_secret = "eval-webhook-secret"
+	doc.save(ignore_permissions=True)
+	try:
+		payments.handle_webhook(body, "forged")
+		raise AssertionError("forged signature accepted")
+	except frappe.PermissionError:
+		pass
+	good = hmac.new(b"eval-webhook-secret", body, hashlib.sha256).hexdigest()
+	assert payments.handle_webhook(body, good)["ok"]
+
+
 def execute():
 	global RT, ROOM
 	# frappe.locale.get_locale_value crashes (UnboundLocalError) when no
@@ -3165,7 +3246,7 @@ def execute():
 		           t36, t37, t38, t39, t40, t41, t42, t43, t44, t45, t46, t47, t48, t49, t50, t51, t53,
 		           t54, t55, t56, t57, t58, t59, t60, t61, t62, t63, t64,
 		           t65, t66, t67, t68, t69, t70,
-		           t71, t72, t73, t74, t75, t76):
+		           t71, t72, t73, t74, t75, t76, t77):
 			fn()
 	finally:
 		frappe.db.commit = real_commit

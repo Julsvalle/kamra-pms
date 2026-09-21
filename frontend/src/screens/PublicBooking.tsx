@@ -16,6 +16,7 @@ import { accentVars } from "../lib/accents"
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
 import { Sheet } from "../components/ui/sheet"
+import { BookingDone, PaymentReturnNote, type BookResult } from "../components/BookingDone"
 import { cur, moneyLocale, adoptUiLocale } from "../lib/money"
 import { formatPhoneDisplay, formatPhoneTel } from "../lib/phone"
 
@@ -191,7 +192,7 @@ export default function PublicBooking() {
   const [addons, setAddons] = useState<Record<string, number>>({})
   const [voucher, setVoucher] = useState("")
   const [voucherMsg, setVoucherMsg] = useState<{ ok: boolean; text: string } | null>(null)
-  const [done, setDone] = useState<{ reservation: string; amount: number } | null>(null)
+  const [done, setDone] = useState<BookResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -340,7 +341,7 @@ export default function PublicBooking() {
     setBusy(true)
     setError(null)
     try {
-      const res = await call<{ reservation: string; amount_after_tax: number }>(
+      const res = await call<BookResult>(
         "kamra.public_api.book",
         {
           property,
@@ -356,7 +357,7 @@ export default function PublicBooking() {
             .map(([experience, qty]) => ({ experience, qty })),
         },
       )
-      setDone({ reservation: res.reservation, amount: res.amount_after_tax })
+      setDone(res)
     } catch (e) {
       setError(serverError(e))
     } finally {
@@ -400,6 +401,9 @@ export default function PublicBooking() {
       className="min-h-screen bg-zinc-50"
       style={accentVars(data?.property.brand_accent)}
     >
+      <div className="px-5 pt-4 empty:hidden">
+        <PaymentReturnNote params={new URLSearchParams(location.search)} />
+      </div>
       {/* hero — photo when available, otherwise brand accent fill */}
       <div className="relative h-72 overflow-hidden sm:h-96">
         {heroSrc ? (
@@ -968,7 +972,7 @@ export default function PublicBooking() {
       {booking && (
         <Sheet
           wide
-          title={done ? "Booking confirmed" : "Complete your booking"}
+          title={done ? (done.pay_url && done.status !== "Confirmed" ? "One step left: pay to confirm" : done.status === "Requested" ? "Request sent" : "Booking confirmed") : "Complete your booking"}
           description={
             done
               ? undefined
@@ -995,15 +999,7 @@ export default function PublicBooking() {
           }
         >
           {done ? (
-            <div className="space-y-3">
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-800">
-                <p className="text-lg font-semibold">{done.reservation}</p>
-                <p className="mt-1 text-sm">
-                  Total {cur()}{inr(done.amount)} - payable at the hotel. We've saved
-                  your number; the front desk will reach out before arrival.
-                </p>
-              </div>
-            </div>
+            <BookingDone result={done} />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">

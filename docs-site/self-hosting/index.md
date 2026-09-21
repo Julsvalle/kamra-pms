@@ -53,8 +53,8 @@ time; that's the point of open source.
    Housekeeping; roles decide what each person sees.
 3. **Email** — [set up SMTP](/self-hosting/email) for confirmations,
    invoices and briefings.
-4. **Payments** — add gateway keys in the payments app (e.g. Razorpay
-   Settings); turn off test mode.
+4. **Payments** — [connect the property's Razorpay account](/payments)
+   under Settings → Payments, with the webhook secret; turn off test mode.
 5. **Scheduler** — `install.sh` enables it; night audit runs at 03:00 site
    time and housekeeping SLAs escalate every 15 min.
 6. **Backups** — `bench backup --with-files` on cron to off-site storage.

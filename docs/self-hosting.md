@@ -26,7 +26,7 @@ classic bench install.
 **Accounts / keys (optional but typical)**
 
 - SMTP credentials for email ([email setup](email-setup.md))
-- Razorpay/Stripe keys for payment links (configure in the payments app)
+- A Razorpay account for payment links and online advances (Settings → Payments)
 - An LLM API key on your side if you connect an AI agent (BYOK — Kamra
   never proxies or marks up model calls)
 
@@ -85,9 +85,9 @@ sudo bench setup production $(whoami)   # nginx + supervisor + SSL
    per deployment; never reuse dev keys.
 4. **Email** — [set up outgoing email](email-setup.md) for confirmations,
    invoices and briefings.
-5. **Payments** — add gateway keys in the payments app's settings (e.g.
-   *Razorpay Settings*), then enable per-property *Payment Gateway
-   Settings* (turn **off** test mode).
+5. **Payments** — in Kamra, Settings → Payments: the property's Razorpay
+   key, secret and webhook secret (turn **off** test mode). See the
+   docs site page *Online payments*.
 6. **Scheduler** — ensure `bench --site <site> enable-scheduler`; the night
    audit runs at 03:00 site time.
 7. **Backups** — `bench --site <site> set-config backup_limit 10` and wire

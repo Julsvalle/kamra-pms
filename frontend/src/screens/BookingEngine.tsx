@@ -611,10 +611,10 @@ export default function BookingEngine() {
                     </label>
                   )}
                   <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                    Online collection uses whatever payment gateway is configured
-                    in the Payments app (Razorpay, Stripe, etc.). Until a gateway
-                    is connected, the advance is recorded as due and settled at
-                    the desk.
+                    Guests pay the advance online through this property's Razorpay
+                    account (Settings → Payments), and the booking confirms itself
+                    when the payment lands. Until an account is connected, the
+                    advance is recorded as due and settled at the desk.
                   </div>
                 </div>
               )}

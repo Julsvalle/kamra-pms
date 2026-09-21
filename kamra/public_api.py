@@ -764,12 +764,32 @@ def book(property: str, room_type: str, check_in_date: str,
 
 	final_status = frappe.db.get_value(
 		"Reservation", result["reservation"], "status")
+
+	# Take the advance online when the property has a gateway. A gateway
+	# failure never loses the booking: it stays on hold and the desk follows up.
+	pay = None
+	pay_error = None
+	if advance_due > 0 and final_status in ("Pending Payment", "Held"):
+		from kamra.payments import create_advance_link
+		try:
+			pay = create_advance_link(result["reservation"])
+			frappe.db.commit()  # nosemgrep: frappe-manual-commit -- keeps the activity-log row for the link on this public request; reviewed as intentional
+		except Exception:
+			frappe.db.rollback()
+			frappe.log_error(title=f"Advance link failed for {result['reservation']}")
+			pay_error = "Online payment is unavailable right now. The hotel will contact you to collect the advance."
+
 	return {
 		"reservation": result["reservation"],
 		"amount_after_tax": result["amount_after_tax"],
 		"advance_due": advance_due,
 		"payment_policy": policy,
 		"pay_at_hotel": advance_due <= 0,
+		"pay_url": pay["url"] if pay else None,
+		"pay_amount": pay["amount"] if pay else None,
+		"pay_error": pay_error,
+		"hold_expires_on": frappe.db.get_value(
+			"Reservation", result["reservation"], "hold_expires_on"),
 		"status": final_status,
 		"idempotent_replay": int(result.get("idempotent_replay") or 0),
 		"cleaning_fee": float(

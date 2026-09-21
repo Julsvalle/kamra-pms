@@ -68,8 +68,8 @@ links to the deeper guide.
 
 - [ ] **Booking engine**: photos, description, policies, FAQs, brand
   colour; enable the public page and make a test booking on it;
-  configure advance collection and the payment gateway if collecting
-  online
+  configure advance collection and [online payments](/payments) if
+  collecting online
 - [ ] **Channel manager** for OTA sync —
   [setup guide](/channel-manager): Channex self-serve today, STAAH /
   AioSell with their partner credentials. Map room types, push ARI,
