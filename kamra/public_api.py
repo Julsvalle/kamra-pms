@@ -64,7 +64,7 @@ def _property_payload(prop) -> dict:
 		"address_line": prop.address_line,
 		"city": prop.city, "state": prop.state,
 		"pincode": prop.pincode,
-		"country": prop.get("country") or "India",
+		"country": prop.get("country") or "Costa Rica",
 		"phone": prop.phone, "email": prop.email,
 		"website": prop.website,
 		"google_reviews_url": prop.get("google_reviews_url"),
@@ -243,9 +243,15 @@ def _public_locale(property: str) -> dict:
 	prop = frappe.get_cached_doc("Property", property)
 	loc = pack_for(property).locale(prop)
 	# "" is a valid symbol (generic pack shows bare numbers) - only the
-	# missing key falls back to the rupee
-	return {"currency_symbol": loc.get("currency_symbol", "₹"),
-	        "locale": loc.get("locale") or "en-IN"}
+	# missing key falls back to the local site's Costa Rican configuration
+	return {
+		"currency_symbol": loc.get("currency_symbol", "₡"),
+		"locale": loc.get("locale") or "es-CR",
+		"currency": loc.get("currency") or "CRC",
+		"tax_label": loc.get("tax_label") or "IVA",
+		"tax_id_label": loc.get("tax_id_label") or "Cédula jurídica",
+		"tax_rates": loc.get("tax_rates") or [0, 13],
+	}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -634,13 +640,16 @@ def _advance_terms(prop, total: float) -> tuple[float, str]:
 	a later policy change never re-bills an existing guest."""
 	mode = prop.get("booking_payment_mode") or "Pay at hotel"
 	total = float(total or 0)
+	from kamra.localization import pack_for
+	loc = pack_for(prop.name).locale(prop)
+	symbol = loc.get("currency_symbol") or f"{loc.get('currency') or 'CRC'} "
 	if mode == "Advance percent":
 		pct = float(prop.get("advance_percent") or 0)
 		due = round(total * pct / 100, 2)
-		return due, f"{pct:g}% advance (₹{due:,.0f}) now, rest at the hotel"
+		return due, f"{pct:g}% advance ({symbol}{due:,.0f}) now, rest at the hotel"
 	if mode == "Registration fee":
 		due = min(float(prop.get("registration_fee") or 0), total)
-		return due, f"₹{due:,.0f} registration fee now, rest at the hotel"
+		return due, f"{symbol}{due:,.0f} registration fee now, rest at the hotel"
 	if mode == "Full online":
 		return total, "Full amount paid online"
 	return 0.0, "Pay at the hotel"
@@ -800,8 +809,9 @@ def check_voucher(property: str, code: str, nights: int = 1):
 		v = validate_voucher(property, code, int(nights or 1))
 	except Exception as e:
 		return {"ok": False, "message": str(e)}
+	symbol = _public_locale(property)["currency_symbol"]
 	label = (f"{v.value:g}% off" if v.discount_type == "Percent"
-	         else f"₹{v.value:,.0f} off")
+	         else f"{symbol}{v.value:,.0f} off")
 	return {"ok": True, "message": f"'{v.voucher_code}' applied - {label}.",
 	        "discount_type": v.discount_type, "value": float(v.value)}
 

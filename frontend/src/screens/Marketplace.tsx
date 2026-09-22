@@ -241,7 +241,7 @@ export default function Marketplace() {
                           </label>
                           <input
                             className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm"
-                            placeholder="+91 80 4000 8000"
+                            placeholder="+506 2222 1000"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                           />

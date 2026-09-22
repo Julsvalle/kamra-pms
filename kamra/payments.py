@@ -46,9 +46,10 @@ def create_payment_link(folio_name: str) -> dict:
 		from payments.utils import get_payment_gateway_controller
 
 		controller = get_payment_gateway_controller(settings.gateway)
+		currency = frappe.db.get_value("Property", folio.property, "currency") or "CRC"
 		url = controller.get_payment_url(**{
 			"amount": float(folio.balance),
-			"currency": "INR",
+			"currency": currency,
 			"title": f"Stay bill {folio.name}",
 			"description": f"{folio.guest_name} · {folio.reservation}",
 			"reference_doctype": "Folio",
@@ -63,9 +64,13 @@ def create_payment_link(folio_name: str) -> dict:
 	folio.db_set("payment_link_url", url, update_modified=False)
 
 	from kamra.savings import log_action
+	from kamra.localization import pack_for
+	symbol = pack_for(folio.property).locale(
+		frappe.get_cached_doc("Property", folio.property)
+	).get("currency_symbol") or "CRC "
 	log_action("send_payment_link", "Folio", folio.name, folio.property,
 	           minutes_saved=4,
-	           rationale=f"Payment link ₹{folio.balance:,.0f} for {guest.full_name}",
+	           rationale=f"Payment link {symbol}{folio.balance:,.0f} for {guest.full_name}",
 	           channel="API")
 	return {"url": url, "link_id": link_id, "amount": float(folio.balance),
 	        "test_mode": bool(settings.test_mode)}
@@ -108,9 +113,13 @@ def razorpay_webhook():
 		_recalculate(folio)
 		folio.save(ignore_permissions=True)
 		from kamra.savings import log_action
+		from kamra.localization import pack_for
+		symbol = pack_for(folio.property).locale(
+			frappe.get_cached_doc("Property", folio.property)
+		).get("currency_symbol") or "CRC "
 		log_action("payment_received", "Folio", folio.name, folio.property,
 		           minutes_saved=3,
-		           rationale=f"₹{amount:,.0f} auto-posted from payment link",
+		           rationale=f"{symbol}{amount:,.0f} auto-posted from payment link",
 		           agent_name="Payments", channel="API")
 	frappe.db.commit()  # nosemgrep: frappe-manual-commit -- persists the completed operation before returning to an external/public caller; reviewed as intentional
 	return {"ok": True, "folio": folio.name, "posted": not already}

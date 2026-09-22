@@ -504,7 +504,7 @@ function MenuSheet({
           <Field label="Cuisine">
             <input
               className={inputCls}
-              placeholder="North Indian"
+              placeholder="Costa Rican"
               value={m.cuisine ?? ""}
               onChange={(e) => set("cuisine", e.target.value)}
             />

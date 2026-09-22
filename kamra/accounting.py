@@ -64,6 +64,6 @@ def export_invoices(property: str, from_date: str, to_date: str):
 		"components": components,           # tax column keys, in order
 		"tax_label": ctx["tax_label"],      # "GST" / "Tax"
 		"tax_id_label": ctx["tax_id_label"],  # "GSTIN" / "Tax ID"
-		"currency": prop.get("currency") or "INR",
+		"currency": prop.get("currency") or "CRC",
 		"totals": totals,
 	}

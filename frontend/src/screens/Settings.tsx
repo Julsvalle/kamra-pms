@@ -12,10 +12,10 @@ import { useT } from "../lib/i18n"
 import { Button } from "../components/ui/button"
 import ImageField from "../components/ImageField"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { cur, moneyLocale } from "../lib/money"
+import { cur, locale, moneyLocale, taxLabel } from "../lib/money"
 
 /** Settings hub - everything an owner/GM configures once and forgets:
- * property identity, GST, privacy, booking page, payments, agent access. */
+ * property identity, taxes, privacy, booking page, payments, agent access. */
 
 type Doc = Record<string, unknown>
 
@@ -215,7 +215,7 @@ const PROPERTY_SPECS: Spec[] = [
   {
     field: "country",
     label: "Country",
-    hint: "Selects the tax & invoicing pack. India and Indonesia today; more via the Marketplace.",
+    hint: "Selects the country's tax and invoicing pack.",
   },
   {
     field: "timezone",
@@ -227,7 +227,7 @@ const PROPERTY_SPECS: Spec[] = [
   { field: "phone", label: "Phone" },
   { field: "email", label: "Email" },
   { field: "website", label: "Website" },
-  { field: "gstin", label: "GSTIN" },
+  { field: "gstin", label: locale().tax_id_label },
   { field: "address_line", label: "Address" },
   { field: "city", label: "City" },
   { field: "state", label: "State" },
@@ -248,7 +248,7 @@ const STAY_TAX_SPECS: Spec[] = [
   { field: "checkout_time", label: "Check-out time", type: "time" },
   {
     field: "gst_mode",
-    label: "GST mode",
+    label: `${taxLabel()} mode`,
     type: "select",
     options: ["Slab", "Fixed"],
     hint: "Slab: rate switches at the threshold per night",
@@ -258,11 +258,11 @@ const STAY_TAX_SPECS: Spec[] = [
     label: `Slab threshold (${cur()})`,
     type: "number",
   },
-  { field: "gst_rate_low", label: "GST % below threshold", type: "number" },
-  { field: "gst_rate_high", label: "GST % above threshold", type: "number" },
+  { field: "gst_rate_low", label: `${taxLabel()} % below threshold`, type: "number" },
+  { field: "gst_rate_high", label: `${taxLabel()} % above threshold`, type: "number" },
   {
     field: "rates_include_tax",
-    label: "Displayed rates include GST",
+    label: `Displayed rates include ${taxLabel()}`,
     type: "check",
   },
   {

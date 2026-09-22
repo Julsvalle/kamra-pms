@@ -25,7 +25,7 @@ import {
   FileSpreadsheet,
   HeartPulse,
   Home,
-  IndianRupee,
+  CircleDollarSign,
   Landmark,
   LayoutGrid,
   ListChecks,
@@ -221,7 +221,7 @@ export const APPS: AppDef[] = [
       { to: "/laundry", label: "Laundry", icon: Shirt, group: "Billing" },
       // Books
       { to: "/ledgers", label: "Ledgers", icon: BookOpen, group: "Books" },
-      { to: "/reports", label: "Reports", icon: IndianRupee, group: "Books" },
+      { to: "/reports", label: "Reports", icon: CircleDollarSign, group: "Books" },
       { to: "/accounting-export", label: "Accounting Export", icon: FileSpreadsheet, group: "Books" },
     ],
     extraPrefixes: ["/billing/", "/cashier/", "/ledgers", "/folio-history"],

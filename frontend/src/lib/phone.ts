@@ -51,6 +51,8 @@ const DIAL_BY_COUNTRY: Record<string, string> = {
   "united states of america": "1",
   canada: "1",
   ca: "1",
+  "costa rica": "506",
+  cr: "506",
   mexico: "52",
   mx: "52",
   brazil: "55",
@@ -161,6 +163,7 @@ const LENGTH_BY_DIAL: Record<string, { min: number; max: number }> = {
 
   // Americas
   "1": { min: 10, max: 10 }, // US / Canada
+  "506": { min: 8, max: 8 }, // Costa Rica
   "52": { min: 10, max: 10 }, // Mexico
   "55": { min: 10, max: 11 }, // Brazil
 
@@ -218,8 +221,8 @@ export function phoneLengthForDial(dial: string): { min: number; max: number } {
 }
 
 export function dialForCountry(country?: string | null): string {
-  const key = (country || "India").trim().toLowerCase()
-  return DIAL_BY_COUNTRY[key] || "91"
+  const key = (country || "Costa Rica").trim().toLowerCase()
+  return DIAL_BY_COUNTRY[key] || "506"
 }
 
 /** Digits only, drop a leading trunk 0. */

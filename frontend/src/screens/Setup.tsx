@@ -6,7 +6,7 @@ import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { cn } from "../lib/utils"
-import { cur } from "../lib/money"
+import { cur, locale } from "../lib/money"
 import { useT } from "../lib/i18n"
 
 const inputCls =
@@ -32,12 +32,12 @@ interface RoomTypeRow {
 const HOTEL_ROOM_DEFAULT: RoomTypeRow = {
   code: "STD",
   name: "Standard",
-  base_price: "2500",
+  base_price: "45000",
   adults: "2",
   numbers: "",
   room_category: "Private",
   free_child_age: "6",
-  extra_adult_price: "2100",
+  extra_adult_price: "12000",
   air_conditioning: "AC",
   weekend_price: "",
 }
@@ -45,7 +45,7 @@ const HOTEL_ROOM_DEFAULT: RoomTypeRow = {
 const STR_LISTING_DEFAULT: RoomTypeRow = {
   code: "HOME",
   name: "Entire place",
-  base_price: "8500",
+  base_price: "95000",
   adults: "4",
   numbers: "",
   room_category: "Villa",
@@ -89,13 +89,13 @@ export default function Setup() {
     minimum_nights: "1",
     booking_payment_mode: "Advance percent",
     advance_percent: "100",
-    security_deposit_amount: "5000",
+    security_deposit_amount: "50000",
   })
   const [roomTypes, setRoomTypes] = useState<RoomTypeRow[]>([{ ...HOTEL_ROOM_DEFAULT }])
   const [mealPlans, setMealPlans] = useState([
     { code: "EP", label: "Room Only", price_per_adult: "0", on: true },
-    { code: "CP", label: "Breakfast Included", price_per_adult: "300", on: true },
-    { code: "MAP", label: "Breakfast + Dinner", price_per_adult: "700", on: false },
+    { code: "CP", label: "Breakfast Included", price_per_adult: "6500", on: true },
+    { code: "MAP", label: "Breakfast + Dinner", price_per_adult: "18000", on: false },
   ])
   const [csv, setCsv] = useState("")
 
@@ -330,11 +330,11 @@ export default function Setup() {
             <>
               {(
                 [
-                  ["property_name", t("Property name *"), "text", "Sunrise Residency"],
-                  ["city", t("City"), "text", "Bengaluru"],
-                  ["state", t("State"), "text", "Karnataka"],
-                  ["phone", t("Phone"), "text", "+91 …"],
-                  ["gstin", t("GSTIN"), "text", "29XXXXX…"],
+                  ["property_name", t("Property name *"), "text", "Hotel Central San José"],
+                  ["city", t("City"), "text", "San José"],
+                  ["state", t("State"), "text", "San José"],
+                  ["phone", t("Phone"), "text", "+506 …"],
+                  ["gstin", locale().tax_id_label, "text", "3-101-123456"],
                   ["checkin_time", t("Check-in Time"), "time", ""],
                   ["checkout_time", t("Check-out Time"), "time", ""],
                   ["minimum_nights", t("Minimum Nights"), "number", "1"],
@@ -755,7 +755,7 @@ export default function Setup() {
                   rows={7}
                   placeholder={
                     "Guest Name,Mobile,Room Type,Arrival Date,Departure Date,Adults,Status\n" +
-                    '"Rao, Asha",+91 98xxxx,Deluxe,25/12/2025,28/12/2025,2,Checked Out'
+                    '"Vargas, Ana",+506 7000 0000,Deluxe,25/12/2026,28/12/2026,2,Checked Out'
                   }
                   value={csv}
                   onChange={(e) => {

@@ -121,7 +121,7 @@ interface Info {
   }
 }
 
-const ID_TYPES = ["Aadhaar", "Passport", "Driving License", "Voter ID", "Other"]
+const ID_TYPES = ["Costa Rican ID", "DIMEX", "Passport", "Driving License", "Other"]
 
 export default function PublicCheckin() {
   const { token } = useParams()
@@ -130,7 +130,7 @@ export default function PublicCheckin() {
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
   const [form, setForm] = useState({
-    id_type: "Aadhaar", id_number: "", email: "", nationality: "Indian",
+    id_type: "Costa Rican ID", id_number: "", email: "", nationality: "Costa Rican",
     address_line: "", city: "", eta: "", special_requests: "",
   })
   const [signature, setSignature] = useState("")
@@ -147,8 +147,8 @@ export default function PublicCheckin() {
         setForm((f) => ({
           ...f,
           email: i.guest.email ?? "",
-          id_type: i.guest.id_type || "Aadhaar",
-          nationality: i.guest.nationality ?? "Indian",
+          id_type: i.guest.id_type || "Costa Rican ID",
+          nationality: i.guest.nationality ?? "Costa Rican",
         }))
         // a boolean, never a URL - the guest can't be shown their own photo
         // back (Frappe refuses a Guest session any private file), so after a
@@ -274,7 +274,7 @@ export default function PublicCheckin() {
               {p.id_retention === "Verify & Discard"
                 ? "Your ID photo is used only to confirm your identity at arrival, and is permanently deleted when you check out. Only hotel staff can see it."
                 : "Your ID photo is kept with the guest register the hotel is required by law to maintain. Only hotel staff can see it."}
-              {form.id_type === "Aadhaar" && " A masked Aadhaar (last 4 digits showing) is fine."}
+              {form.id_type === "Costa Rican ID" && " Enter the Costa Rican ID number as shown on the document."}
             </p>
 
             <DocCapture

@@ -12,7 +12,7 @@ import {
   type Quote,
 } from "../lib/api"
 import { Button } from "./ui/button"
-import { cur, moneyLocale } from "../lib/money"
+import { cur, moneyLocale, locale } from "../lib/money"
 import {
   clampLocal,
   isPhoneComplete,
@@ -1215,7 +1215,7 @@ export function BookingDialog(props: {
                       </div>
                     )}
                     <div className="flex justify-between text-zinc-600">
-                      <span>GST {quote.tax_percent}%</span>
+                      <span>{locale().tax_label} {quote.tax_percent}%</span>
                       <span className="tabular-nums">
                         {cur()}
                         {inr(quote.tax_amount)}
@@ -1242,7 +1242,7 @@ export function BookingDialog(props: {
                     )}
                     {addonsGross > 0 && (
                       <div className="flex justify-between text-zinc-600">
-                        <span>Add-ons (incl. GST)</span>
+                        <span>Add-ons (incl. {locale().tax_label})</span>
                         <span className="tabular-nums">
                           {cur()}
                           {inr(addonsGross)}

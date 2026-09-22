@@ -9,7 +9,7 @@ import { serverError } from "../lib/resource"
 import { useCashierAuth } from "../lib/cashierAuth"
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
-import { cur, moneyLocale, taxLabel } from "../lib/money"
+import { cur, locale, moneyLocale, taxLabel } from "../lib/money"
 import { useT } from "../lib/i18n"
 import {
   Card,
@@ -569,7 +569,7 @@ export default function FolioView() {
                 <p className="text-sm text-zinc-500">
                   {property.gstin && (
                     <>
-                      GSTIN: <span className="font-medium">{property.gstin}</span>{" "}
+                      {locale().tax_id_label}: <span className="font-medium">{property.gstin}</span>{" "}
                       ·{" "}
                     </>
                   )}
@@ -603,7 +603,7 @@ export default function FolioView() {
               <span className="text-zinc-500">{t("Bill to")}: </span>
               <span className="font-medium">{data.bill_to.name}</span>
               {data.bill_to.gstin && (
-                <span className="text-zinc-500"> · GSTIN {data.bill_to.gstin}</span>
+                <span className="text-zinc-500"> · {locale().tax_id_label} {data.bill_to.gstin}</span>
               )}
             </div>
           )}
@@ -986,8 +986,7 @@ export default function FolioView() {
                   {(taxRows.length ? taxRows : gst_summary.map((g) => ({
                     rate: g.rate, taxable: g.taxable, total_tax: g.total_tax,
                     parts: [
-                      { label: "CGST", rate: g.rate / 2, amount: g.cgst },
-                      { label: "SGST", rate: g.rate / 2, amount: g.sgst },
+                      { label: taxLabel(), rate: g.rate, amount: g.total_tax },
                     ],
                   }))).map((r) => (
                     <tr key={r.rate}>
@@ -1095,9 +1094,9 @@ export default function FolioView() {
           {folio.invoice_number && (
             <div className="mt-8 flex items-end justify-between border-t border-zinc-200 pt-4 text-xs text-zinc-500">
               <p className="max-w-md">
-                {t("This is a computer-generated tax invoice under the GST Act.")}
+                {t("This is a computer-generated tax invoice.")}
                 {property.gstin
-                  ? ` ${t("Amounts are inclusive of GST at the rates shown.")}`
+                  ? ` ${t("Amounts are inclusive of {tax} at the rates shown.", { tax: taxLabel() })}`
                   : ""}
               </p>
               <div className="text-center">
@@ -1153,7 +1152,7 @@ export default function FolioView() {
               >
                 {rates.map((n) => String(n)).map((r) => (
                   <option key={r} value={r}>
-                    {t("GST {rate}%", { rate: r })}
+                    {taxLabel()} {r}%
                   </option>
                 ))}
               </select>
@@ -1210,7 +1209,7 @@ export default function FolioView() {
                   >
                     {rates.map((n) => String(n)).map((r) => (
                       <option key={r} value={r}>
-                        GST {r}%
+                        {taxLabel()} {r}%
                       </option>
                     ))}
                   </select>

@@ -18,13 +18,20 @@ def fnb_tax_rate(property) -> float:
 
 
 def tax_rate_options(property) -> list:
-	return [0, 5, 10, 12, 15, 20]
+	return [0, 5, 10, 12, 13, 15, 20]
+
+
+def _tax_labels(prop_doc) -> tuple[str, str]:
+	if (prop_doc.get("country") or "").strip().lower() == "costa rica":
+		return "IVA", "Cédula jurídica"
+	return "Tax", "Tax ID"
 
 
 def invoice_context(prop_doc) -> dict:
+	tax_label, tax_id_label = _tax_labels(prop_doc)
 	return {
-		"tax_label": "Tax",
-		"tax_id_label": "Tax ID",
+		"tax_label": tax_label,
+		"tax_id_label": tax_id_label,
 		"service_code": None,
 		"sac": None,
 		"place_of_supply": prop_doc.get("state"),
@@ -35,15 +42,16 @@ def invoice_context(prop_doc) -> dict:
 
 def locale(prop_doc) -> dict:
 	currency = prop_doc.get("currency") or "USD"
+	tax_label, tax_id_label = _tax_labels(prop_doc)
 	# the Currency master knows the symbol ($, £, €, S$, ...); on a bare
 	# site with no currency records the code itself becomes the symbol -
 	# "USD 1,500" beats a bare unlabelled number
 	symbol = frappe.db.get_value("Currency", currency, "symbol")
 	return {
 		"currency_symbol": symbol or f"{currency} ",
-		"locale": "en-US",
+		"locale": prop_doc.get("locale") or "en-US",
 		"currency": currency,
-		"tax_label": "Tax",
-		"tax_id_label": "Tax ID",
+		"tax_label": tax_label,
+		"tax_id_label": tax_id_label,
 		"tax_rates": tax_rate_options(prop_doc.name),
 	}

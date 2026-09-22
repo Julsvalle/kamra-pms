@@ -65,6 +65,8 @@ def is_playground() -> bool:
 
 def scheduled():
 	"""Scheduler entry: no-op on real tenants, never throws."""
+	if frappe.db.get_default("kamra_disable_demo_reset") == "1":
+		return
 	if not is_playground():
 		return
 	reset()

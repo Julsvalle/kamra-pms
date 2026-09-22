@@ -339,7 +339,7 @@ def quote(
 			"total": float(total),
 			"deposit_required": deposit_required,
 		},
-		"currency": prop.get("currency") or "INR",
+		"currency": prop.get("currency") or "CRC",
 		"quote_version": 1,
 		"quoted_at": str(now_datetime()),
 	}

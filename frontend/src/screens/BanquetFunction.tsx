@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import {
   ArrowLeft,
-  BadgeIndianRupee,
+  CircleDollarSign,
   CalendarClock,
   CheckSquare,
   FileText,
@@ -694,18 +694,18 @@ function DetailTab({
             <Field label={`${taxLabel()} number`}>
               <input
                 className={inputCls}
-                placeholder="29AABCU9603R1ZM"
+                placeholder="3-101-123456"
                 value={get("gstin", "")}
                 onChange={(e) => set("gstin", e.target.value.toUpperCase())}
               />
             </Field>
             <Field
               label="Place of supply"
-              hint="Decides CGST+SGST vs IGST"
+              hint="Tax jurisdiction for the event"
             >
               <input
                 className={inputCls}
-                placeholder="Karnataka"
+                placeholder="Costa Rica"
                 value={get("place_of_supply", "")}
                 onChange={(e) => set("place_of_supply", e.target.value)}
               />
@@ -1838,7 +1838,7 @@ function MoneyTab({
         <CardHeader>
           <CardTitle>
             <span className="inline-flex items-center gap-1.5">
-              <BadgeIndianRupee className="size-4" />
+              <CircleDollarSign className="size-4" />
               Settlement
             </span>
           </CardTitle>

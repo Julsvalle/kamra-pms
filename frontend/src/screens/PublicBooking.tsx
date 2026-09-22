@@ -16,7 +16,7 @@ import { accentVars } from "../lib/accents"
 import { Badge } from "../components/ui/badge"
 import { Button } from "../components/ui/button"
 import { Sheet } from "../components/ui/sheet"
-import { cur, moneyLocale, adoptUiLocale } from "../lib/money"
+import { cur, moneyLocale, adoptUiLocale, locale } from "../lib/money"
 import { formatPhoneDisplay, formatPhoneTel } from "../lib/phone"
 
 const inr = (n: number) =>
@@ -281,7 +281,7 @@ export default function PublicBooking() {
         "@type": "PostalAddress",
         addressLocality: p.city,
         addressRegion: p.state,
-        addressCountry: "IN",
+        addressCountry: "CR",
       },
       checkinTime: p.checkin_time?.slice(0, 5),
       checkoutTime: p.checkout_time?.slice(0, 5),
@@ -292,7 +292,7 @@ export default function PublicBooking() {
       makesOffer: data.room_types.map((rt) => ({
         "@type": "Offer",
         name: rt.room_type_name,
-        priceCurrency: "INR",
+        priceCurrency: locale().currency,
         price: rt.base_price,
         itemOffered: {
           "@type": offerType,
@@ -1013,7 +1013,7 @@ export default function PublicBooking() {
               </label>
               <label className="block">
                 <span className="mb-1.5 block text-sm font-medium text-zinc-600">Phone</span>
-                <input className={inputCls} value={form.phone} placeholder="+91 …"
+                <input className={inputCls} value={form.phone} placeholder="+506 …"
                   onChange={(e) => setForm({ ...form, phone: e.target.value })} />
               </label>
               <label className="block">
