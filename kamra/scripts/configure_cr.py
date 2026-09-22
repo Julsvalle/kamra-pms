@@ -71,6 +71,16 @@ GUESTS = {
 }
 
 
+DEMO_USER_NAMES = {
+	"admin@kamra.local": ("Administración", "Hotel Central"),
+	"gm@kamra.local": ("Gabriela", "Mora"),
+	"frontdesk@kamra.local": ("Diego", "Ramírez"),
+	"revenue@kamra.local": ("Daniela", "Campos"),
+	"finance@kamra.local": ("Mauricio", "Brenes"),
+	"hk@kamra.local": ("Rosa", "Alvarado"),
+}
+
+
 LOCAL_GUESTS = [
 	("Carlos", "Vargas", "San José"),
 	("María", "Rodríguez", "Heredia"),
@@ -762,6 +772,13 @@ def execute():
 	frappe.db.set_default("kamra_demo_mode", "0")
 	frappe.db.set_default("kamra_disable_demo_reset", "1")
 	_configure_system()
+	for email, (first_name, last_name) in DEMO_USER_NAMES.items():
+		if frappe.db.exists("User", email):
+			frappe.db.set_value(
+				"User", email,
+				{"first_name": first_name, "last_name": last_name},
+				update_modified=False,
+			)
 	_configure_properties()
 	_configure_guests()
 	_configure_showcase()
