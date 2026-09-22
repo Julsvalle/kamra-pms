@@ -776,7 +776,11 @@ def execute():
 		if frappe.db.exists("User", email):
 			frappe.db.set_value(
 				"User", email,
-				{"first_name": first_name, "last_name": last_name},
+				{
+					"first_name": first_name,
+					"last_name": last_name,
+					"full_name": f"{first_name} {last_name}",
+				},
 				update_modified=False,
 			)
 	_configure_properties()
